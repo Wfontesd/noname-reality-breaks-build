@@ -1,17 +1,9 @@
-# NoName — Reality Breaks (public build)
+# NoName — Reality Breaks (public test build)
 
-This repository contains only the generated public Web build of NoName —
-Reality Breaks. The Flutter source project is maintained separately and is not
-included here.
+Build-only repository generated from the private Flutter source.
 
-The run starts as a first-person dungeon crawler, then opens six deterministic
-dimensions: Falling Blocks, Maze, Match-3, Breakout, Snake, and Legacy Shmup.
-The cache offers a persistent build trait that changes the rules between
-dimensions. Keyboard and touch controls are available.
+This release contains the Living Dungeon iteration: first-person dungeon exploration, tactical encounters, persistent oath/relic choices, and the optional Ashen Sanctuary, Sealed Reliquary, Blighted Altar, and Oathbreaker Chamber.
 
-Play the build at:
+Play: https://wfontesd.github.io/noname-reality-breaks-build/
 
-https://wfontesd.github.io/noname-reality-breaks-build/
-
-Generated with Flutter Web from the private source project. This repository
-is intentionally build-only so the source remains private.
+Source revision: `8a3df4fa7d5102272ef6e1788dc6e98a1567cf75`
