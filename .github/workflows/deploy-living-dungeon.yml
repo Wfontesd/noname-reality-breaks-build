@@ -1,0 +1,63 @@
+name: Deploy validated Living Dungeon build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy-living-dungeon.yml
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out public build repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Download validated private build artifact
+        run: >-
+          curl --fail --location --retry 3
+          'https://sdmntprnortheu.oaiusercontent.com/files/00000000-bb20-81f4-93d6-4169fc1254d0/raw?se=2026-08-14T15%3A31%3A39Z&sp=r&sv=2026-02-06&sr=b&scid=8f38de40-2807-5190-901e-b97fb77002f7&skoid=e5f84a89-964a-4fd3-92c2-c2cb3a12ea16&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-14T05%3A13%3A14Z&ske=2026-08-15T05%3A13%3A14Z&sks=b&skv=2026-02-06&sig=%2BV7xtAdKvKDPEZjEuVKKbLEeX7IZLomdfxQkwiqO8zc%3D'
+          --output /tmp/living-dungeon-public-web.zip
+
+      - name: Replace repository with build-only output
+        shell: bash
+        run: |
+          shopt -s dotglob nullglob
+          for path in * .*; do
+            case "$path" in
+              .|..|.git) continue ;;
+            esac
+            rm -rf -- "$path"
+          done
+          unzip -q /tmp/living-dungeon-public-web.zip -d .
+          touch .nojekyll
+          printf '%s\n' '8a3df4fa7d5102272ef6e1788dc6e98a1567cf75' > .last_build_id
+          printf '%s\n' '8a3df4fa7d5102272ef6e1788dc6e98a1567cf75' > .source_revision
+          printf '%s\n' 'living-dungeon-public-test' > .release_channel
+          cat > README.md <<'EOF'
+          # NoName — Reality Breaks (public test build)
+
+          Build-only repository generated from the private Flutter source.
+
+          This release contains the Living Dungeon iteration: first-person dungeon exploration, tactical encounters, persistent oath/relic choices, and the optional Ashen Sanctuary, Sealed Reliquary, Blighted Altar, and Oathbreaker Chamber.
+
+          Play: https://wfontesd.github.io/noname-reality-breaks-build/
+
+          Source revision: `8a3df4fa7d5102272ef6e1788dc6e98a1567cf75`
+          EOF
+
+      - name: Publish build-only commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'build: publish Living Dungeon test release'
+          git push origin main
