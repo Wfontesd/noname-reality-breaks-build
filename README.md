@@ -2,9 +2,9 @@
 
 Build-only repository generated from the private Flutter source.
 
-This release contains the completed fourth major iteration: the Living Dungeon plus all six Shattered Realms, their realm-specific playfields, shared oath presentation, responsive mobile/desktop HUDs, and Veil Rupture transitions.
+This release contains the merged dark-fantasy experience: the Living Dungeon, six Shattered Realms, tactical oath combat, relic inventory, realm outcomes, responsive mobile/desktop UI, and Veil Rupture transitions.
 
 Play: https://wfontesd.github.io/noname-reality-breaks-build/
 
-Source revision: `fa00bf310fa6e2a7024481ed25cb6a91f90d2450`
-Validated branch revision: `1f84f5131218d89e7b7935fb2d28d43684ca14bc`
+Source revision: `f8393cbea807080e8396928f83a743ba552ec536`
+Release channel: `final-dark-fantasy-public-test`
