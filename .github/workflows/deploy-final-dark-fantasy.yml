@@ -1,0 +1,69 @@
+name: Deploy merged dark fantasy build
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/deploy-final-dark-fantasy.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-public-dark-fantasy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out public build repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Download private Web artifact
+        run: >-
+          curl --fail --location --retry 3
+          'https://sdmntprnortheu.oaiusercontent.com/files/00000000-a48c-81f4-abda-4389461242dc/raw?se=2026-08-14T20%3A18%3A27Z&sp=r&sv=2026-02-06&sr=b&scid=5d432d34-ff2f-571a-a4a8-20a93d89e1d9&skoid=d4d17077-8f33-42a9-bd8b-aa9d5eaf5320&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-08-14T18%3A43%3A27Z&ske=2026-08-15T18%3A43%3A27Z&sks=b&skv=2026-02-06&sig=0XAQgvMgg0SdJAsEBG1WLHOA0NKAg4r8YW5XTQuyNP4%3D'
+          --output /tmp/noname-final-dark-fantasy.zip
+
+      - name: Replace repository with build-only output
+        shell: bash
+        run: |
+          shopt -s dotglob nullglob
+          for path in * .*; do
+            case "$path" in
+              .|..|.git) continue ;;
+            esac
+            rm -rf -- "$path"
+          done
+          unzip -q /tmp/noname-final-dark-fantasy.zip -d .
+          grep -q '<base href="/noname-reality-breaks-build/">' index.html
+          touch .nojekyll
+          printf '%s\n' 'f8393cbea807080e8396928f83a743ba552ec536' > .last_build_id
+          printf '%s\n' 'f8393cbea807080e8396928f83a743ba552ec536' > .source_revision
+          printf '%s\n' 'final-dark-fantasy-public-test' > .release_channel
+          cat > README.md <<'EOF'
+          # NoName — Reality Breaks (public test build)
+
+          Build-only repository generated from the private Flutter source.
+
+          This release contains the merged dark-fantasy experience: the Living Dungeon, six Shattered Realms, tactical oath combat, relic inventory, realm outcomes, responsive mobile/desktop UI, and Veil Rupture transitions.
+
+          Play: https://wfontesd.github.io/noname-reality-breaks-build/
+
+          Source revision: `f8393cbea807080e8396928f83a743ba552ec536`
+          Release channel: `final-dark-fantasy-public-test`
+          EOF
+
+      - name: Publish build-only commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'build: publish the merged dark fantasy test release'
+          git push origin main
